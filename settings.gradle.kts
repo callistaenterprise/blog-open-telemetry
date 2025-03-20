@@ -13,6 +13,7 @@ pluginManagement {
 
 rootProject.name = "opentelemetry-exploration"
 include(
-    "avro-schema"
+    "avro-schema",
+    "weather-producer"
 )
 

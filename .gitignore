@@ -9,3 +9,6 @@ build
 
 # Qodo files
 .qodo
+
+# Quarkus CLI files
+.quarkus

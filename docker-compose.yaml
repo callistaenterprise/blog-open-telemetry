@@ -1,0 +1,83 @@
+services:
+
+  broker:
+    image: apache/kafka:4.0.0
+    hostname: kafka-broker
+    container_name: kafka-broker
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      # Replace CLUSTER_ID with a unique base64 UUID using "bin/kafka-storage.sh random-uuid"
+      # See https://docs.confluent.io/kafka/operations-tools/kafka-tools.html#kafka-storage-sh
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+
+  schema-registry:
+    image: quay.io/apicurio/apicurio-registry:3.0.6
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - broker
+    ports:
+      - "8081:8080"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      REGISTRY_APIS_V2_DATE_FORMAT: yyyy-MM-dd'T'HH:mm:ss'Z'
+
+  weather-producer:
+    image: opentelemetry-exploration/weather-producer
+    hostname: weather-producer
+    container_name: weather-producer
+    depends_on:
+      kafka-startup:
+        condition: service_healthy
+    environment:
+      QUARKUS_PROFILE: prod
+    build:
+      dockerfile: ./weather-producer/Dockerfile
+
+  kafka-startup:
+    container_name: startup
+    image: confluentinc/cp-kafka:7.9.0
+    depends_on:
+      - broker
+      - schema-registry
+    volumes:
+      - ./avro-schema/src/main/avro:/app/avro-schema
+      - ./apicurio:/app/apicurio/
+    environment:
+      KAFKA_BROKER_ID: ignored
+      KAFKA_ZOOKEEPER_CONNECT: ignored
+    command: "
+        bash -c 'cub kafka-ready -b broker:29092 1 120 && \
+              kafka-topics --create --if-not-exists --bootstrap-server broker:29092 --topic weather-avro --partitions 10 && \ 
+              curl -X POST -H \"content-type: application/json\" --data @/app/apicurio/validity_rule.json http://schema-registry:8080/apis/registry/v2/admin/rules && \
+              curl -X POST -H \"content-type: application/json\" --data @/app/apicurio/compatibility_rule.json http://schema-registry:8080/apis/registry/v2/admin/rules && \
+              curl -X POST -H \"X-Registry-ArtifactType=AVRO\" -H \"X-Registry-ArtifactId: weather-avro-schema\" -H \"X-Registry-Version: alpha\" --data-binary @/app/avro-schema/weather-schema.avsc http://schema-registry:8080/apis/registry/v2/groups/weather/artifacts && \ 
+              curl http://schema-registry:8080/apis/registry/v2/search/artifacts && \ 
+              kafka-topics --create --if-not-exists --bootstrap-server broker:29092 --topic initcomplete --partitions 1 && \
+              kafka-topics --list --bootstrap-server broker:29092 && \              
+              sleep 60'
+              "
+    healthcheck:
+      test: [ "CMD", "kafka-topics", "--bootstrap-server", "broker:29092", "--topic", "initcomplete", "--describe" ]
+      interval: 10s
+      timeout: 10s
+      retries: 4
