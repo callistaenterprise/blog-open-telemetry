@@ -16,3 +16,4 @@ To do:
 * Extract logs from Quarkus app
 * Extract metrics from Quarkus app
 * Extract trace from Quarkus app
+* Trace across Kafka - does it work?
