@@ -1,0 +1,147 @@
+{
+  "namespace": "se.martin.weather.avro",
+  "name": "WeatherReading",
+  "type": "record",
+  "fields": [
+    {
+      "name": "recordingId",
+      "type": "string",
+      "doc": "A unique id for the recording"
+    },
+    {
+      "name": "location",
+      "type": {
+        "namespace": "se.martin.weather.avro",
+        "name": "Location",
+        "type": "record",
+        "doc": "location of reading",
+        "fields": [
+          {
+            "name": "name",
+            "type": [
+              "string",
+              "null"
+            ],
+            "doc": "Common name for station"
+          },
+          {
+            "name": "stationId",
+            "type": "string",
+            "doc": "Code representing station"
+          },
+          {
+            "name": "latitude",
+            "type": "double",
+            "doc": "latitude of recording station"
+          },
+          {
+            "name": "longitude",
+            "type": "double",
+            "doc": "longitude of recording station"
+          },
+          {
+            "name": "elevation",
+            "type": [
+              "double",
+              "null"
+            ],
+            "doc": "elevation of recording station"
+          }
+        ]
+      }
+    },
+    {
+      "name": "observationTimeUtc",
+      "type": "string",
+      "doc": "Time of recording (UTC)"
+    },
+    {
+      "name": "observations",
+      "type": [
+        "null",
+        {
+          "namespace": "se.martin.weather.avro",
+          "name": "Observations",
+          "type": "record",
+          "doc": "Measurements taken in the reading",
+          "fields": [
+            {
+              "name": "solarRadiation",
+              "type": [
+                "double",
+                "null"
+              ],
+              "doc": "Solar radiation"
+            },
+            {
+              "name": "ultraViolet",
+              "type": [
+                "double",
+                "null"
+              ],
+              "doc": "Ultraviolet measurement"
+            },
+            {
+              "name": "precipitationRate",
+              "type": [
+                "double",
+                "null"
+              ],
+              "doc": "Rate of rain"
+            },
+            {
+              "name": "precipitationTotal24hh",
+              "type": [
+                "double",
+                "null"
+              ],
+              "doc": "Total rain in preceding 24 hours"
+            },
+            {
+              "name": "temperatureCelsius",
+              "type": [
+                "double",
+                "null"
+              ],
+              "doc": "Temperature in degrees Celsius"
+            },
+            {
+              "name": "windChillCelsius",
+              "type": [
+                "double",
+                "null"
+              ],
+              "doc": "Experienced chill factor (in degress celsius)"
+            },
+            {
+              "name": "windSpeed",
+              "type": [
+                "double",
+                "null"
+              ],
+              "doc": "Wind Speed (meters per second)"
+            },
+            {
+              "name": "visibility",
+              "type": [
+                "null",
+                {
+                  "namespace": "se.martin.weather.avro",
+                  "name": "Visibility",
+                  "type": "enum",
+                  "symbols": [
+                    "good",
+                    "average",
+                    "poor",
+                    "total_utter_darkness"
+                  ],
+                  "doc": "Perceived visibility measurement"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
