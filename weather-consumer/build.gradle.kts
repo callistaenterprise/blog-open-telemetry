@@ -19,16 +19,13 @@ dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-arc")
 
-    // Scheduler support for producers
-    implementation("io.quarkus:quarkus-scheduler")
-
     // Kafka support
     implementation("io.quarkus:quarkus-messaging-kafka")
 
     // Avro schema support
     implementation("io.quarkus:quarkus-apicurio-registry-avro")
 
-    // Avro schema v1
+    // Avro schema
     implementation(project(":avro-schema"))
 
     // Test support

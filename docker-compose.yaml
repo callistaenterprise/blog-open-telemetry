@@ -53,6 +53,18 @@ services:
     build:
       dockerfile: ./weather-producer/Dockerfile
 
+  weather-consumer:
+    image: opentelemetry-exploration/weather-consumer
+    hostname: weather-consumer
+    container_name: weather-consumer
+    depends_on:
+      kafka-startup:
+        condition: service_healthy
+    environment:
+      QUARKUS_PROFILE: prod
+    build:
+      dockerfile: ./weather-consumer/Dockerfile
+
   kafka-startup:
     container_name: startup
     image: confluentinc/cp-kafka:7.9.0
