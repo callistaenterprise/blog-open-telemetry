@@ -65,6 +65,20 @@ services:
     build:
       dockerfile: ./weather-consumer/Dockerfile
 
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.122.1
+    hostname: otel-collector
+    container_name: otel-collector
+    volumes:
+      - ./otel-collector/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+
+  grafana-lgtm:
+    image: grafana/otel-lgtm:0.9.1
+    hostname: grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+
   kafka-startup:
     container_name: startup
     image: confluentinc/cp-kafka:7.9.0
