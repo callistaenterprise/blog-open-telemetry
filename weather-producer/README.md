@@ -1,3 +1,12 @@
+Notes:
+* Add quarkus opentelemetry extension
+
+
+
+
+--------
+
+
 # kafka-serialization-blog
 
 A Quarkus project to illustrate how JSON Schema, Avro and Protobuf can be used for serialization and deserialization of

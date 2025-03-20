@@ -14,6 +14,7 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
+    implementation("io.quarkus:quarkus-opentelemetry")
 
     // Quarkus platform
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
@@ -30,6 +31,12 @@ dependencies {
 
     // Avro schema v1
     implementation(project(":avro-schema"))
+
+    // Observability dev services for Loki - Grafana - Tempo and Mimir
+    implementation("io.quarkus:quarkus-observability-devservices-lgtm")
+
+    // Dump otel exports to console for debugging
+    implementation("io.opentelemetry:opentelemetry-exporter-logging")
 
     // Test support
     testImplementation("io.quarkus:quarkus-junit5")
