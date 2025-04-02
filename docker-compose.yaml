@@ -60,8 +60,6 @@ services:
     depends_on:
       kafka-startup:
         condition: service_healthy
-    ports:
-      - "9002:9002"
     environment:
       QUARKUS_PROFILE: prod
     build:
@@ -71,8 +69,13 @@ services:
     image: otel/opentelemetry-collector-contrib:0.122.1
     hostname: otel-collector
     container_name: otel-collector
+    environment:
+      TMPDIR: /data/tmp/
     volumes:
       - ./otel-collector/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    depends_on:
+      kafka-startup:
+        condition: service_healthy
 
   grafana-lgtm:
     image: grafana/otel-lgtm:0.9.1

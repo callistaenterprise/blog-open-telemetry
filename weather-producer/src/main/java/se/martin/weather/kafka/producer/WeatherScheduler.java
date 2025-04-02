@@ -26,8 +26,6 @@ public class WeatherScheduler {
     @ConfigProperty(name = "se.martin.weather.station.name", defaultValue = "unknown")
     String stationName;
 
-    private Instant stopTime;
-
     @Inject
     @Channel("out-weather-avro")
     Emitter<WeatherReading> avroEmitter;
@@ -38,14 +36,8 @@ public class WeatherScheduler {
 
     @Scheduled(every = "1s")
     void generate() {
-        // Stop the process after 10 minutes
-        if (stopTime == null) {
-            stopTime = Instant.now().plusSeconds(600);
-        }
-        if (Instant.now().isBefore(stopTime)) {
-            var weather = weatherService.fetch(stationName);
-            publishAvro(weather);
-        }
+        var weather = weatherService.fetch(stationName);
+        publishAvro(weather);
     }
 
     private void publishAvro(Weather weather) {

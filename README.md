@@ -11,9 +11,12 @@ To do:
 * Only producing to one partition?
 * Native instrumentation
 * SDK and API
-* Add metrics to Quarkus app
-* Add trace to Quarkus app
-* Extract logs from Quarkus app
-* Extract metrics from Quarkus app
-* Extract trace from Quarkus app
-* Trace across Kafka - does it work?
+* Monitor Kafka with JMX
+
+
+# Findings:
+
+* OTEL Certification
+* Quarkus is easy to integrate with - both OTEL emission and scraping
+* OTEL collector
+* Nice Grafana LGTM container
