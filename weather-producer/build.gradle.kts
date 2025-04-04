@@ -14,9 +14,6 @@ val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
-    implementation("io.quarkus:quarkus-micrometer-opentelemetry")
-    implementation("io.quarkus:quarkus-opentelemetry")
-
     // Quarkus platform
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
     implementation("io.quarkus:quarkus-arc")
@@ -32,6 +29,10 @@ dependencies {
 
     // Avro schema v1
     implementation(project(":avro-schema"))
+
+    // OpenTelemetry
+    implementation("io.quarkus:quarkus-opentelemetry")
+    implementation("io.quarkus:quarkus-micrometer-opentelemetry")
 
     // Observability dev services for Loki - Grafana - Tempo and Mimir
     implementation("io.quarkus:quarkus-observability-devservices-lgtm")
