@@ -1,4 +1,4 @@
-# Blog - Observability wit OpenTelemetry
+# Blog - Observability with OpenTelemetry
 
 This blog contains a working application to demonstrate OpenTelemetry integration with applications.
 
