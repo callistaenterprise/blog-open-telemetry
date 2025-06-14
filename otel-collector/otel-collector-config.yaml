@@ -26,17 +26,38 @@ receivers:
 processors:
   batch:
 
-  attributes:
-    actions:
-      - key: environment
-        value: prod
-        action: insert
-
   filter:
     error_mode: ignore
     metrics:
         metric:
           - 'IsMatch(name, "http.*")'
+
+  resource/all:
+    attributes:
+      - key: deployment.environment
+        value: prod
+        action: upsert
+      - key: service.namespace
+        value: blog-open-telemetry
+        action: upsert
+
+  resource/weather-consumer:
+    attributes:
+      - key: service.name
+        value: weather-consumer
+        action: upsert
+      - key: service.instance.id
+        value: weather-consumer-1
+        action: upsert
+
+  resource/kafka:
+    attributes:
+      - key: service.name
+        value: kafka
+        action: upsert
+      - key: service.instance.id
+        value: broker-1
+        action: upsert
 
 exporters:
   debug:
@@ -48,30 +69,53 @@ exporters:
 
 service:
   pipelines:
-    metrics:
+    metrics/weather-producer:
       receivers:
         - otlp
+      processors:
+        - batch
+        - filter
+        - resource/all
+      exporters:
+        - otlp
+
+    logs/weather-producer:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/all
+      exporters:
+        - otlp
+
+
+    traces/weather-producer:
+      receivers:
+        - otlp
+      processors:
+        - batch
+        - resource/all
+      exporters:
+        - otlp
+
+    metrics/weather-consumer:
+      receivers:
         - prometheus
+      processors:
+        - batch
+        - filter
+        - resource/all
+        - resource/weather-consumer
+      exporters:
+        - otlp
+
+    metrics/kafka:
+      receivers:
         - kafkametrics
       processors:
         - batch
-        - attributes
         - filter
-      exporters:
-        - otlp
-    logs:
-      receivers:
-        - otlp
-      processors:
-        - batch
-        - attributes
-      exporters:
-        - otlp
-    traces:
-      receivers:
-        - otlp
-      processors:
-        - batch
-        - attributes
+        - resource/all
+        - resource/kafka
       exporters:
         - otlp

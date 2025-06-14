@@ -11,7 +11,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "opentelemetry-exploration"
+rootProject.name = "blog-open-telemetry"
 include(
     "avro-schema",
     "weather-producer",

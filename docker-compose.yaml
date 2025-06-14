@@ -50,6 +50,7 @@ services:
         condition: service_healthy
     environment:
       QUARKUS_PROFILE: prod
+      OTEL_RESOURCE_ATTRIBUTES: service.name=weather-producer,service.instance.id=weather-producer-1
     build:
       dockerfile: ./weather-producer/Dockerfile
 
@@ -66,7 +67,7 @@ services:
       dockerfile: ./weather-consumer/Dockerfile
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.122.1
+    image: otel/opentelemetry-collector-contrib:0.128.0
     hostname: otel-collector
     container_name: otel-collector
     environment:
@@ -78,7 +79,7 @@ services:
         condition: service_healthy
 
   grafana-lgtm:
-    image: grafana/otel-lgtm:0.9.1
+    image: grafana/otel-lgtm:0.11.4
     hostname: grafana
     container_name: grafana
     ports:
